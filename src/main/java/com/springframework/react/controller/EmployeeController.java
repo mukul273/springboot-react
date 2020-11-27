@@ -1,14 +1,16 @@
 package com.springframework.react.controller;
 
+import com.springframework.react.exception.ResourceNotFoundException;
 import com.springframework.react.model.Employee;
 import com.springframework.react.repository.EmployeeRepository;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -25,5 +27,32 @@ public class EmployeeController {
     @GetMapping("employees")
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
+    }
+
+    @PostMapping("/create")
+    public Employee createEmployee(@RequestBody Employee employee) {
+        return employeeRepository.save(employee);
+    }
+
+    @GetMapping("/getEmployee/{id}")
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
+        Employee employeeById = employeeRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Employee "+ id +" not Found")
+        );
+        return ResponseEntity.ok(employeeById);
+    }
+
+    @PutMapping("/updateEmployee/{id}")
+    public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @RequestBody Employee employee) {
+
+        Employee updateEmployee = employeeRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Employee " + id + " not Found")
+        );
+
+        updateEmployee.setFirstName(employee.getFirstName());
+        updateEmployee.setLastName(employee.getLastName());
+        updateEmployee.setEmailId(employee.getEmailId());
+        Employee updatedEmployee = employeeRepository.saveAndFlush(updateEmployee);
+        return ResponseEntity.ok(updatedEmployee);
     }
 }
