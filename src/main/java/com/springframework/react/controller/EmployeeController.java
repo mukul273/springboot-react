@@ -16,7 +16,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/")
 public class EmployeeController {
 
-    private EmployeeRepository employeeRepository;
+    private final EmployeeRepository employeeRepository;
 
     @Autowired
     public EmployeeController(EmployeeRepository employeeRepository) {
@@ -60,7 +60,7 @@ public class EmployeeController {
         Employee deleteEmployee = employeeRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Employee " + id + " not Found")
         );
-        employeeRepository.deleteById(id);
+        employeeRepository.deleteById(deleteEmployee.getId());
 
         Map<String, Boolean> deletedEmployee = new HashMap<>();
         deletedEmployee.put("Deleted", true);
