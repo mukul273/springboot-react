@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -54,5 +56,18 @@ public class EmployeeController {
         updateEmployee.setEmailId(employee.getEmailId());
         Employee updatedEmployee = employeeRepository.saveAndFlush(updateEmployee);
         return ResponseEntity.ok(updatedEmployee);
+    }
+
+    @DeleteMapping("/deleteemp/{id}")
+    public ResponseEntity<Map<String, Boolean>> deleteEmployee(@PathVariable Long id) {
+        Employee deleteEmployee = employeeRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Employee " + id + " not Found")
+        );
+        employeeRepository.deleteById(id);
+
+        Map<String, Boolean> deletedEmployee = new HashMap<>();
+        deletedEmployee.put("Deleted", true);
+
+        return ResponseEntity.ok(deletedEmployee)   ;
     }
 }
